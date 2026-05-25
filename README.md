@@ -1,6 +1,6 @@
 ---
 
-## 📄 Arquivo: `README.md`
+## README.md
 
 ```markdown
 # 🍬 G&H Doces - Sistema de Gestão de Encomendas
