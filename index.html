@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>G&H Encomendas - Pedidos</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://emojicdn.elk.sh/❤️?size=128">
+    <meta name="theme-color" content="#E63946">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+            apiKey: "lorem ipson",
+            authDomain: "lorem ipson",
+            projectId: "lorem ipson",
+            storageBucket: "lorem ipson",
+            messagingSenderId: "lorem ipson",
+            appId: "lorem ipson"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span class="icon">❤️🍬</span>
+                <h1>G&H Encomendas</h1>
+            </div>
+            <p class="subtitle">Amor em formato de doces</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="pedidos">📋 Pedidos</button>
+            <button class="tab-btn" data-tab="financeiro">💰 Financeiro</button>
+            <button class="tab-btn" data-tab="admin">⚙️ Admin</button>
+        </div>
+
+        <!-- ==================== ABA PEDIDOS ==================== -->
+        <div id="tab-pedidos" class="tab-content active">
+            <div class="card form-card">
+                <h2>📝 Nova Encomenda </h2>
+                <form id="orderForm">
+                    <div class="form-group">
+                        <label>👤 Cliente</label>
+                        <input type="text" id="cliente" required placeholder="Nome do cliente">
+                    </div>
+                    <div class="form-group">
+                        <label>📅 Data da Encomenda</label>
+                        <input type="date" id="data" required>
+                    </div>
+                    
+                    <!-- Lista de produtos -->
+                    <div class="form-group">
+                        <label>🍰 Produtos do Pedido</label>
+                        <div id="produtosList" class="produtos-container">
+                            <div class="produto-item" data-index="0">
+                                <div class="form-row">
+                                    <select class="produto-nome" style="flex:2;" required>
+                                        <option value="">Selecione...</option>
+                                        <option value="Maracujá Trufado">Maracujá Trufado</option>
+                                        <option value="Pavê">Pavê</option>
+                                        <option value="Torta de Limão">Torta de Limão</option>
+                                        <option value="Marido Gelado">Marido Gelado</option>
+                                        <option value="Personalizado">🎨 Personalizado (preço livre)</option>
+                                    </select>
+                                    <input type="number" class="produto-qtd" placeholder="Qtd" value="1" min="1" style="flex:1;">
+                                    <input type="number" class="produto-preco" placeholder="Preço R$" step="0.01" style="flex:1;">
+                                    <button type="button" class="btn-remover-produto" style="background:#c0392b; padding:8px 12px;">🗑️</button>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" id="addProdutoBtn" class="btn-secondary" style="margin-top:10px; width:auto;">➕ Adicionar outro produto</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>💰 Status de Pagamento</label>
+                        <select id="statusPagamento" required>
+                            <option value="pendente">💰 Pendente</option>
+                            <option value="pago">✅ Pago</option>
+                            <option value="parcial">💳 Parcial</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>📝 Observações (opcional)</label>
+                        <input type="text" id="observacoes" placeholder="Ex: Entregar na esquina, sem açúcar...">
+                    </div>
+                    
+                    <div class="total-pedido">
+                        <strong>💰 Total do Pedido: R$ <span id="totalPedidoPreview">0,00</span></strong>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">➕ Adicionar Encomenda</button>
+                </form>
+            </div>
+
+            <!-- Filtros rápidos -->
+            <div class="card">
+                <h2>🔍 Filtros Rápidos</h2>
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="all">📋 Todos</button>
+                    <button class="filter-btn" data-filter="pendente">⏳ Pendentes</button>
+                    <button class="filter-btn" data-filter="realizado">✅ Realizados</button>
+                    <button class="filter-btn" data-filter="pronto">🚚 Prontos entrega</button>
+                    <button class="filter-btn" data-filter="nao_pago">💰 Não pagos</button>
+                    <button class="filter-btn" data-filter="pago">✅ Pagos</button>
+                </div>
+                <div class="table-container">
+                    <table id="ordersTable">
+                        <thead>
+                            <tr><th>Status</th><th>Cliente</th><th>Data</th><th>Produtos</th><th>Total</th><th>Pagamento</th><th>Entrega</th><th>Obs</th><th>Ações</th></tr>
+                        </thead>
+                        <tbody id="ordersList"><tr><td colspan="9" style="text-align: center;">🔄 Carregando pedidos...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card summary-card">
+                <h3>📊 Painel de Controle</h3>
+                <div class="summary-stats">
+                    <div class="stat">📦 Total: <span id="totalPedidos">0</span></div>
+                    <div class="stat">⏳ Pendentes: <span id="totalPendentes">0</span></div>
+                    <div class="stat">✅ Realizados: <span id="totalRealizados">0</span></div>
+                    <div class="stat">🚚 Prontos: <span id="totalProntos">0</span></div>
+                </div>
+                <div class="action-buttons">
+                    <button id="clearAllBtn" class="btn-danger">🗑️ Limpar todos pedidos</button>
+                    <button id="exportBtn" class="btn-secondary">📥 Exportar relatório</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== ABA FINANCEIRO ==================== -->
+        <div id="tab-financeiro" class="tab-content">
+            <div class="card">
+                <h2>📈 Ganhos Mensais</h2>
+                <canvas id="ganhosChart" width="400" height="200"></canvas>
+            </div>
+
+            <div class="card">
+                <h2>💰 Resumo Financeiro</h2>
+                <div class="finance-summary">
+                    <div class="finance-card receita"><h4>📥 Receita Total</h4><p id="totalReceitaMes">R$ 0,00</p></div>
+                    <div class="finance-card despesa"><h4>📤 Despesas Totais</h4><p id="totalDespesasMes">R$ 0,00</p></div>
+                    <div class="finance-card lucro" id="lucroCard"><h4>📊 Resultado</h4><p id="resultadoMes">R$ 0,00</p><small id="resultadoStatus">---</small></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>💸 Registrar Gasto</h2>
+                <form id="gastoForm">
+                    <div class="form-row">
+                        <div class="form-group"><label>📅 Data</label><input type="date" id="gastoData" required></div>
+                        <div class="form-group"><label>💰 Valor (R$)</label><input type="number" id="gastoValor" step="0.01" min="0" required></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>🏷️ Categoria</label>
+                            <select id="gastoCategoria" required>
+                                <option value="">Selecione...</option>
+                                <option value="Ingredientes">🥕 Ingredientes</option>
+                                <option value="Embalagens">📦 Embalagens</option>
+                                <option value="Divulgação">📢 Divulgação</option>
+                                <option value="Equipamentos">🔧 Equipamentos</option>
+                                <option value="Transporte">🚗 Transporte</option>
+                                <option value="Outros">📌 Outros</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>📍 Local</label><input type="text" id="gastoLocal" required placeholder="Ex: Supermercado"></div>
+                    </div>
+                    <div class="form-group"><label>📝 Descrição</label><input type="text" id="gastoDescricao" required></div>
+                    <button type="submit" class="btn-primary">➕ Adicionar Gasto</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>📋 Histórico de Gastos</h2>
+                <div class="filters">
+                    <button class="filter-gasto-btn active" data-gasto-filter="all">📋 Todos</button>
+                    <button class="filter-gasto-btn" data-gasto-filter="mes">📅 Este mês</button>
+                    <button class="filter-gasto-btn" data-gasto-filter="ultimos3">📆 Últimos 3 meses</button>
+                </div>
+                <div class="table-container">
+                    <table id="gastosTable">
+                        <thead><tr><th>Data</th><th>Categoria</th><th>Local</th><th>Descrição</th><th>Valor</th><th>Ações</th></tr></thead>
+                        <tbody id="gastosList"><tr><td colspan="6" style="text-align: center;">🔄 Carregando gastos...</td></tr></tbody>
+                    </table>
+                </div>
+                <div class="action-buttons"><button id="exportFinanceiroBtn" class="btn-secondary">📥 Exportar relatório financeiro</button></div>
+            </div>
+        </div>
+
+        <!-- ==================== ABA ADMIN ==================== -->
+        <div id="tab-admin" class="tab-content">
+            <div class="card">
+                <h2>💰 Gerenciar Preços dos Produtos</h2>
+                <div class="info-box">
+                    <p>Os preços padrão são usados quando você não define um preço personalizado no pedido.</p>
+                    <div id="precosProdutosList">
+                        <div class="form-row" style="margin-bottom: 10px;">
+                            <div style="flex:2;"><strong>Produto</strong></div>
+                            <div style="flex:1;"><strong>Preço Padrão (R$)</strong></div>
+                            <div style="flex:1;"><strong>Ações</strong></div>
+                        </div>
+                        <div class="form-row" data-produto="Maracujá Trufado">
+                            <div style="flex:2;">🍋 Maracujá Trufado</div>
+                            <div style="flex:1;"><input type="number" id="preco_maracuja" step="0.01" value="8.00" style="width:100px;"></div>
+                            <div style="flex:1;"><button class="btn-salvar-preco btn-secondary" data-produto="Maracujá Trufado">💾 Salvar</button></div>
+                        </div>
+                        <div class="form-row" data-produto="Pavê">
+                            <div style="flex:2;">🍰 Pavê</div>
+                            <div style="flex:1;"><input type="number" id="preco_pave" step="0.01" value="8.00" style="width:100px;"></div>
+                            <div style="flex:1;"><button class="btn-salvar-preco btn-secondary" data-produto="Pavê">💾 Salvar</button></div>
+                        </div>
+                        <div class="form-row" data-produto="Torta de Limão">
+                            <div style="flex:2;">🍋 Torta de Limão</div>
+                            <div style="flex:1;"><input type="number" id="preco_torta" step="0.01" value="7.00" style="width:100px;"></div>
+                            <div style="flex:1;"><button class="btn-salvar-preco btn-secondary" data-produto="Torta de Limão">💾 Salvar</button></div>
+                        </div>
+                        <div class="form-row" data-produto="Marido Gelado">
+                            <div style="flex:2;">❄️ Marido Gelado</div>
+                            <div style="flex:1;"><input type="number" id="preco_marido" step="0.01" value="6.00" style="width:100px;"></div>
+                            <div style="flex:1;"><button class="btn-salvar-preco btn-secondary" data-produto="Marido Gelado">💾 Salvar</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🔗 Compartilhar Sistema</h2>
+                <div class="share-box">
+                    <label>📱 Link de Acesso:</label>
+                    <div class="link-container">
+                        <input type="text" id="shareLink" readonly>
+                        <button id="copyLinkBtn" class="btn-secondary">📋 Copiar</button>
+                    </div>
+                </div>
+                <div class="info-box">
+                    <h3>🌐 Status da Conexão</h3>
+                    <p id="dbStatus">🟢 Conectado ao Firebase</p>
+                </div>
+                <div class="action-buttons">
+                    <button id="backupBtn" class="btn-secondary">💾 Fazer backup</button>
+                    <button id="restoreBtn" class="btn-secondary" style="background: #FF8C42;">🔄 Restaurar backup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
