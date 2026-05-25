@@ -1,5 +1,3 @@
-README.md
-
 🍬 G&H Doces - Sistema de Gestão de Encomendas
 
 ![Status](https://img.shields.io/badge/status-produção-brightgreen)
