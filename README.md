@@ -1,7 +1,6 @@
 README.md
 
-```markdown
-# 🍬 G&H Doces - Sistema de Gestão de Encomendas
+🍬 G&H Doces - Sistema de Gestão de Encomendas
 
 ![Status](https://img.shields.io/badge/status-produção-brightgreen)
 ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=flat&logo=firebase&logoColor=black)
@@ -11,7 +10,7 @@ README.md
 
 ---
 
-## 📖 Sobre o Projeto
+📖 Sobre o Projeto
 
 **G&H Doces** é um sistema completo de gestão de pedidos desenvolvido especialmente para a doceria **G&H Doces - Amor em formato de doces**.
 
@@ -21,7 +20,7 @@ O sistema foi desenvolvido para facilitar o dia a dia da doceria, permitindo ger
 
 ---
 
-## ✨ Funcionalidades Principais
+✨ Funcionalidades Principais
 
 | Funcionalidade | Descrição |
 |----------------|-----------|
@@ -37,13 +36,13 @@ O sistema foi desenvolvido para facilitar o dia a dia da doceria, permitindo ger
 
 ---
 
-## 🚀 Demonstração Online
+🚀 Demonstração Online
 
 🔗 **Acesse o sistema:** [https://gehdoces-97753.netlify.app](https://gehdoces-97753.netlify.app)
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+🛠️ Tecnologias Utilizadas
 
 | Tecnologia | Finalidade |
 |------------|-------------|
@@ -55,7 +54,7 @@ O sistema foi desenvolvido para facilitar o dia a dia da doceria, permitindo ger
 
 ---
 
-## 📁 Estrutura do Projeto
+📁 Estrutura do Projeto
 
 ```
 gh-doces/
@@ -68,7 +67,7 @@ gh-doces/
 
 ---
 
-## 🎨 Paleta de Cores da Marca
+🎨 Paleta de Cores da Marca
 
 | Cor | Código | Uso |
 |-----|--------|-----|
@@ -81,7 +80,7 @@ gh-doces/
 
 ---
 
-## 📱 Como Instalar como App no Celular
+📱 Como Instalar como App no Celular
 
 ### iOS (iPhone)
 1. Abra o site no **Safari**
@@ -97,7 +96,7 @@ gh-doces/
 
 ---
 
-## 🚀 Como Usar - Guia Rápido
+🚀 Como Usar - Guia Rápido
 
 ### 1️⃣ Adicionar um Pedido
 1. Preencha o nome do **cliente** e a **data**
@@ -127,7 +126,7 @@ gh-doces/
 
 ---
 
-## 🔧 Configuração para Desenvolvimento
+🔧 Configuração para Desenvolvimento
 
 ### Pré-requisitos
 - Conta no [Firebase](https://console.firebase.google.com)
